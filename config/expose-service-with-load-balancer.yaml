@@ -1,0 +1,43 @@
+## menggunakan LoadBalancer service agar bisa mengakses pod dari luar
+## konsepnya tidak jauh berbeda dengan nodePort, hanya saja lebih di optimalkan pada LoadBalancer ini
+
+## flow -> client mengakses IP:PORT tertentu, di arahkan dahulu ke LoadBalancer
+##      -> dari LoadBalancer akan di teruskan ke node yang bersangkutan
+
+## Akan tetapi LoadBalancer tidak dapat di jalankan di local, karena tidak ada support dari minikube
+## Jadi harus langsung mencobanya di cloud platform
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: nginx-rs
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      name: nginx-alpine
+  template:
+    metadata:
+      name: nginx-rs
+      labels:
+        name: nginx-alpine
+    spec:
+      containers:
+        - name: nginx-alpine
+          image: nginx:stable-alpine
+          ports:
+            - containerPort: 80
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: expose-service
+spec:
+  type: LoadBalancer
+  selector:
+    name: nginx-alpine # Sesuai dengan label pada pods / replicaset yang akan di jalankan 
+  ports:
+    - port: 80
+      targetPort: 80 
