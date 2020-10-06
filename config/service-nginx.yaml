@@ -37,6 +37,10 @@ spec:
 ## masuk ke dalam pod curl dengan command
 ##      kubectl exec -it <nama pod (curl)> -- /bin/sh
 ## di dalam shell ketikkan `curl http://{CLUSTER_IP}:PORT  
+## cara lainnya yaitu dengan DNS & environment variable
+##
+## Menggunakan DNS -> http://<servicename>.<namespace>.svc.cluster.local:<port>
+## Menggunakan envVar -> http://{$NGINX_SERVICE_SERVICE_HOST}:{$NGINX_SERVICE_SERVICE_PORT}
 apiVersion: v1
 kind: Pod
 metadata:

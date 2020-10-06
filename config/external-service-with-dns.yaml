@@ -1,0 +1,29 @@
+## Mengakses service dari luar address
+# Misal aplikasi kita membutuhkan service / endpoint dari luar cluster, seperti payment gateway
+# Ada 2 cara yaitu dengan DNS / endpoint
+# disini menggunakan DNS
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-service
+  labels:
+    name: gateway-service
+spec:
+  type: ExternalName # type harus ExternalName
+  externalName: example.com # ini adalah domain external (orang lain)
+  ports:
+    - port: 80
+
+---
+## Hanya untuk keperluan testing
+apiVersion: v1
+kind: Pod
+metadata:
+  name: curl
+  labels:
+    name: curl
+spec:
+  containers:
+    - name: curl
+      image: pimenvibritania/nginx-curl

@@ -8,7 +8,7 @@ spec:
   # Berapa kali job akan di jalankan (4)
   completions: 4
   # Berapa banyak job di jalankan pada satu waktu (2)
-  # Berarti job akan sekaligun menjalankan 2 job pada 1 kali eksekusi,
+  # Berarti job akan sekaligun menjalankan 2 pod pada 1 kali eksekusi,
   # maka disini berarti hanya membutuhkan 2x eksekusi untuk menyelesaikan job
   parallelism: 2
   template:
