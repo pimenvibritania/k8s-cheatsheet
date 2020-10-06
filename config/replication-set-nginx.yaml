@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+# ReplicaSet versi terbaru dari RC
+# perbedaan terletak pada match selector
+kind: ReplicaSet
+metadata:
+  name: nginx-rc
+  labels:
+    environment: acc
+spec:
+  replicas: 3
+  selector:
+    matchExpressions:
+      - key : app
+        operator : In
+        values :
+          - nginx-alpine
+      - key : env
+        operator : In
+        values : 
+          - acc
+  template:
+    metadata:
+      name: nginx-alpine #nama pod
+      labels: # Labels harus match dengan semua key yang ada di selector
+        app: nginx-alpine 
+        env : acc
+    spec:
+      containers:
+        - name: nginx-alpine-rc
+          image: nginx:stable-alpine
+          ports:
+            - containerPort: 80
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 1

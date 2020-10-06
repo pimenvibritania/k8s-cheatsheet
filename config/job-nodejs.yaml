@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+# Job biasa digunakan untuk menjalankan aplikasi yang tidak sering dunakan atau sekali dijalankan
+# seperti migrate db , export, dll
+kind: Job
+metadata:
+  name: nodejs-job
+spec:
+  # Berapa kali job akan di jalankan (4)
+  completions: 4
+  # Berapa banyak job di jalankan pada satu waktu (2)
+  # Berarti job akan sekaligun menjalankan 2 job pada 1 kali eksekusi,
+  # maka disini berarti hanya membutuhkan 2x eksekusi untuk menyelesaikan job
+  parallelism: 2
+  template:
+    spec:
+      restartPolicy: Never # harus di set never untuk job
+      containers:
+        - name: nodejs-job
+          image: pimenvibritania/nodejs-job

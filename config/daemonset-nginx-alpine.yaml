@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+# Jika kita ingin menginstall aplikasi di berbeda nodes
+# misal kita memiliki 10 nodes, dan ingin d pasang aplikasi logger, maka daemonset cocok
+# daemonset akan menginstall 1 pod di semua nodes
+# tapi karena di local hanya mempunyai 1 nodes 'minikube', maka hanya 1 pod yang akan terpasang
+
+kind: DaemonSet
+metadata:
+  name: daemon-nginx
+  labels:
+    name: daemon-nginx
+spec:
+  selector:
+    matchLabels:
+      name: daemon-nginx
+  template:
+    metadata:
+      name: daemon-nginx
+      labels:
+        name: daemon-nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:stable-alpine
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 1

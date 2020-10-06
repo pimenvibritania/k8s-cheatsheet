@@ -1,0 +1,66 @@
+# node selector , apabila ingin menjalankan pod di node tertentu
+# di identifikasi dengan label pada node nya
+# cara menambahkan label pada node : 
+#       kubectl label node <nama node> <key label> <value label> 
+# ex: kubectl label node minikube gpu=true
+# akan membuat label baru pada node minikube dengan key gpu dan value true
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-alpine
+  labels:
+      environment: Acceptance
+spec:
+# tambahkan key nodeSelector dengan value label yang akan d identifikasi
+  nodeSelector:
+    gpu: "true"
+  containers:
+    - name: nginx-alpine
+      image: nginx:stable-alpine
+      ports:
+        - containerPort: 80
+      resources:
+        limits:
+          memory: 512Mi
+          cpu: "1"
+        requests:
+          memory: 256Mi
+          cpu: "0.2"
+      # ===================== PROBE =====================
+      # Probe untuk health check
+      # contoh di path livenessprob berisi `/test` yang mana halaman itu tidak ada
+      # dan pastinya akan menimbulkan error, yang nantinya pods akan di restart
+      livenessProbe:
+        httpGet:
+          path: /test
+          port: 80
+        # pemeriksaan akan dimulai 5 detik ketika aplikasi di jalankan
+        initialDelaySeconds: 5
+        # selang 5 detik sekali livenessProbe akan di jalankan  
+        periodSeconds: 5
+        # waktu timeout ktika pengecekan gagal 1 detik
+        timeoutSeconds: 1
+        # ketika status nya failure, dan dilakukan pengecekan kembali, 1x sukses maka di anggap sukses
+        successThreshold: 1
+        # ketika status nya 3 kali failure, akan di anggap gagal
+        failureThreshold: 3
+      readinessProbe:
+        httpGet:
+          path: /
+          port: 80
+        initialDelaySeconds: 0
+        periodSeconds: 10
+        timeoutSeconds: 1
+        successThreshold: 1
+        failureThreshold: 3
+      startupProbe:
+        httpGet:
+          path: / 
+          port: 80
+        initialDelaySeconds: 0
+        periodSeconds: 10
+        timeoutSeconds: 1
+        successThreshold: 1
+        failureThreshold: 3
+      # ================== END PROBE ==================
+      

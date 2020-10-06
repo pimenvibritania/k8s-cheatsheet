@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-alpine
+  # Menambahkan label, label bisa d query dengan contoh : kubectl get pod -l <key> = <value>
+  # label tidak boleh menggunakan spasi
+  labels:
+      environment: Acceptance
+      tag: 1.0.0-rc1
+      author: pimenvibritania
+  # Menambahkan annotation, tidak bisa di filter, biasanya di gunakan untuk menambahkan deskripsi
+  # bisa menampung size hingga 256 kb
+  annotations:
+      desription: aplikasi ini berjalan di Acceptance
+      command: melihat anotasi bisa dengan perintah 'kubectl describe pod <pod>'
+spec:
+  containers:
+    - name: nginx-alpine
+      image: nginx:stable-alpine
+      ports:
+        - containerPort: 80
+      resources:
+        limits:
+          memory: 512Mi
+          cpu: "1"
+        requests:
+          memory: 256Mi
+          cpu: "0.2"
+      # ===================== PROBE =====================
+      # Probe untuk health check
+      # contoh di path livenessprob berisi `/test` yang mana halaman itu tidak ada
+      # dan pastinya akan menimbulkan error, yang nantinya pods akan di restart
+      livenessProbe:
+        httpGet:
+          path: /test
+          port: 80
+        # pemeriksaan akan dimulai 5 detik ketika aplikasi di jalankan
+        initialDelaySeconds: 5
+        # selang 5 detik sekali livenessProbe akan di jalankan  
+        periodSeconds: 5
+        # waktu timeout ktika pengecekan gagal 1 detik
+        timeoutSeconds: 1
+        # ketika status nya failure, dan dilakukan pengecekan kembali, 1x sukses maka di anggap sukses
+        successThreshold: 1
+        # ketika status nya 3 kali failure, akan di anggap gagal
+        failureThreshold: 3
+      readinessProbe:
+        httpGet:
+          path: /
+          port: 80
+        initialDelaySeconds: 0
+        periodSeconds: 10
+        timeoutSeconds: 1
+        successThreshold: 1
+        failureThreshold: 3
+      startupProbe:
+        httpGet:
+          path: / 
+          port: 80
+        initialDelaySeconds: 0
+        periodSeconds: 10
+        timeoutSeconds: 1
+        successThreshold: 1
+        failureThreshold: 3
+      # ================== END PROBE ==================
+      
